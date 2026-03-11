@@ -1,0 +1,22 @@
+{
+  "name": "linkedin-agent",
+  "version": "1.0.0",
+  "description": "Daily LinkedIn post agent — engineering leadership voice, powered by Claude",
+  "main": "src/agent.js",
+  "scripts": {
+    "start": "node src/agent.js",
+    "preview": "node scripts/preview-post.js",
+    "history": "node scripts/history.js",
+    "get-urn": "node scripts/get-person-urn.js",
+    "post-now": "IMMEDIATE_RUN=true node src/agent.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
