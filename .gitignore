@@ -1,4 +1,6 @@
 node_modules/
 .env
-data/
 *.log
+
+# Track agent.json (theme rotation + post history)
+# data/ is committed so state persists between GitHub Actions runs
