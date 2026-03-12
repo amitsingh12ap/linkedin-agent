@@ -1,22 +1,17 @@
 /**
  * run-once.js — GitHub Actions entry point.
  *
- * Two modes controlled by env var:
+ * MODE=draft  (default, cron job)
+ *   - Rolls dice: skip ~2/7 days, picks random IST hour (8 AM–1 PM)
+ *   - Generates post, saves as pendingDraft, sends WhatsApp for approval
  *
- *   MODE=draft  (default, cron job)
- *     - Rolls dice: skip ~2/7 days
- *     - Picks random IST hour (8 AM–1 PM)
- *     - When it's time: generates post, saves as pendingDraft, sends WhatsApp for approval
- *
- *   MODE=post  (triggered by approve link via post-approved.yml)
- *     - Reads pendingDraft from agent.json
- *     - Posts to LinkedIn
- *     - Clears pendingDraft
+ * MODE=post  (triggered by approve link)
+ *   - Reads pendingDraft from agent.json, posts to LinkedIn, clears draft
  */
 require("dotenv").config();
 const { generatePost }        = require("./generator");
 const { postToLinkedIn }      = require("./linkedin");
-const { getNextTheme, markThemeUsed, initDB, loadDB, saveDB } = require("./db");
+const { getNextTheme, markThemeUsed, initDB, loadDB, saveDB, getRecentPostTypes } = require("./db");
 const { sendApprovalRequest } = require("./notifier");
 const logger                  = require("./logger");
 
@@ -37,7 +32,7 @@ function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// ── MODE: post (called after user approves on WhatsApp) ───────────────────────
+// ── MODE: post ────────────────────────────────────────────────────────────────
 async function postApproved() {
   await initDB();
   const db = await loadDB();
@@ -47,41 +42,36 @@ async function postApproved() {
     return;
   }
 
-  const { themeId, postText } = db.pendingDraft;
-  logger.info(`📤 Posting approved draft (theme: ${themeId})`);
+  const { themeId, postText, postType } = db.pendingDraft;
+  logger.info(`📤 Posting approved draft (theme: ${themeId}, type: ${postType})`);
   logger.info(`✍️  Post:\n${"─".repeat(50)}\n${postText}\n${"─".repeat(50)}`);
 
   const result = await postToLinkedIn(postText);
   logger.info(`✅ Published! LinkedIn URN: ${result.id}`);
 
-  await markThemeUsed(themeId, postText, result.id);
-
-  // Clear the pending draft
+  await markThemeUsed(themeId, postText, result.id, postType);
   db.pendingDraft = null;
   await saveDB(db);
   logger.info("💾 Draft cleared, history saved.");
 }
 
-// ── MODE: draft (cron, randomised) ───────────────────────────────────────────
+// ── MODE: draft ───────────────────────────────────────────────────────────────
 async function draftAndNotify() {
   await initDB();
   const db    = await loadDB();
   const today = getISTDateString();
   const istHour = getISTHour();
 
-  // Already sent for approval today?
   if (db.pendingDraft && db.pendingDraft.date === today) {
     logger.info(`📨 Approval already sent today (${today}). Waiting for user action.`);
     return;
   }
 
-  // Already posted today?
   if (db.lastPosted === today) {
     logger.info(`✅ Already posted today (${today}). Skipping.`);
     return;
   }
 
-  // Decide for today (once per day)
   if (!db.todayDecision || db.todayDecision.date !== today) {
     const shouldPost  = Math.random() < 5 / 7;
     const targetHour  = randInt(8, 13);
@@ -91,38 +81,28 @@ async function draftAndNotify() {
   }
 
   const { shouldPost, targetHour } = db.todayDecision;
+  if (!shouldPost) { logger.info(`🚫 Randomly skipping today.`); return; }
+  if (istHour < targetHour) { logger.info(`⏳ Target ${targetHour}:xx IST, now ${istHour}:xx. Waiting.`); return; }
 
-  if (!shouldPost) {
-    logger.info(`🚫 Randomly skipping today. No post.`);
-    return;
-  }
-
-  if (istHour < targetHour) {
-    logger.info(`⏳ Target ${targetHour}:xx IST, now ${istHour}:xx IST. Will generate later.`);
-    return;
-  }
-
-  // Time to generate draft
+  // Pick theme
   const VALID_THEMES = ["engineering-leadership","ai-productivity","streaming-tech","personal-growth"];
   const override = process.env.THEME_OVERRIDE;
-  let theme;
-  if (override && override !== "auto" && VALID_THEMES.includes(override)) {
-    theme = { id: override, name: override };
-  } else {
-    theme = await getNextTheme();
-  }
+  const theme = (override && override !== "auto" && VALID_THEMES.includes(override))
+    ? { id: override, name: override }
+    : await getNextTheme();
 
-  logger.info(`📌 Generating draft for theme: ${theme.name || theme.id}`);
-  const postText = await generatePost(theme);
-  logger.info(`✍️  Draft:\n${"─".repeat(50)}\n${postText}\n${"─".repeat(50)}`);
+  // Get recent post types so generator avoids repeating them
+  const recentPostTypes = getRecentPostTypes(3);
+  logger.info(`📌 Theme: ${theme.name || theme.id} | Recent types: [${recentPostTypes.join(", ")}]`);
 
-  // Save as pending draft
+  const { post: postText, postType } = await generatePost(theme, recentPostTypes);
+  logger.info(`✍️  Draft (type: ${postType}):\n${"─".repeat(50)}\n${postText}\n${"─".repeat(50)}`);
+
   const draftId = `${today}-${Date.now()}`;
-  db.pendingDraft = { draftId, themeId: theme.id, postText, date: today };
+  db.pendingDraft = { draftId, themeId: theme.id, postText, postType, date: today };
   await saveDB(db);
-  logger.info(`💾 Draft saved (id: ${draftId})`);
+  logger.info(`💾 Draft saved (id: ${draftId}, type: ${postType})`);
 
-  // Send WhatsApp approval request
   await sendApprovalRequest(postText, draftId);
   logger.info(`📱 WhatsApp sent — waiting for approval.`);
 }
@@ -131,12 +111,8 @@ async function draftAndNotify() {
 async function main() {
   const mode = process.env.MODE || "draft";
   logger.info(`🚀 Running in MODE=${mode}`);
-
-  if (mode === "post") {
-    await postApproved();
-  } else {
-    await draftAndNotify();
-  }
+  if (mode === "post") await postApproved();
+  else await draftAndNotify();
 }
 
 main().catch((err) => {

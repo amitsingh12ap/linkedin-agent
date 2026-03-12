@@ -11,7 +11,6 @@ const THEMES = [
   { id: "personal-growth",        name: "Personal Growth & Career Advice" },
 ];
 
-// IST date string e.g. "2026-03-12"
 function getISTDateString() {
   const now = new Date();
   const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -22,9 +21,11 @@ function getISTDateString() {
 
 function loadStore() {
   if (!fs.existsSync(DB_PATH)) {
-    return { lastIndex: -1, lastPosted: null, todayDecision: null, history: [] };
+    return { lastIndex: -1, lastPosted: null, todayDecision: null, recentPostTypes: [], history: [] };
   }
-  return JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
+  const store = JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
+  if (!store.recentPostTypes) store.recentPostTypes = [];
+  return store;
 }
 
 function saveStore(store) {
@@ -32,7 +33,6 @@ function saveStore(store) {
   fs.writeFileSync(DB_PATH, JSON.stringify(store, null, 2), "utf8");
 }
 
-// Aliases used by run-once.js for explicit load/save control
 function loadDB()        { return Promise.resolve(loadStore()); }
 function saveDB(store)   { saveStore(store); return Promise.resolve(); }
 
@@ -49,16 +49,28 @@ function getNextTheme() {
   return Promise.resolve(THEMES[nextIndex]);
 }
 
-function markThemeUsed(themeId, postText, linkedinId = null) {
+// Returns last N post types so generator can avoid repeating them
+function getRecentPostTypes(n = 3) {
+  const store = loadStore();
+  return (store.recentPostTypes || []).slice(-n);
+}
+
+function markThemeUsed(themeId, postText, linkedinId = null, postType = null) {
   const store = loadStore();
   const theme = THEMES.find((t) => t.id === themeId);
   store.lastIndex = THEMES.indexOf(theme);
-  // Store as IST date string so "already posted today" check works correctly
   store.lastPosted = getISTDateString();
+
+  // Track post type history for anti-repeat logic (keep last 5)
+  if (postType) {
+    store.recentPostTypes = [...(store.recentPostTypes || []), postType].slice(-5);
+  }
+
   store.history.unshift({
     id: Date.now(),
     theme_id: themeId,
     theme_name: theme.name,
+    post_type: postType,
     post_text: postText,
     posted_at: new Date().toISOString(),
     linkedin_id: linkedinId,
@@ -72,4 +84,4 @@ function getRecentPosts(limit = 10) {
   return store.history.slice(0, limit);
 }
 
-module.exports = { initDB, getNextTheme, markThemeUsed, getRecentPosts, loadDB, saveDB };
+module.exports = { initDB, getNextTheme, markThemeUsed, getRecentPosts, getRecentPostTypes, loadDB, saveDB };
