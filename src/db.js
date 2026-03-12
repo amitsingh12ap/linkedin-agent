@@ -11,9 +11,18 @@ const THEMES = [
   { id: "personal-growth",        name: "Personal Growth & Career Advice" },
 ];
 
+// IST date string e.g. "2026-03-12"
+function getISTDateString() {
+  const now = new Date();
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  const istMs = utcMs + 5.5 * 3600000;
+  const ist = new Date(istMs);
+  return `${ist.getFullYear()}-${String(ist.getMonth() + 1).padStart(2, "0")}-${String(ist.getDate()).padStart(2, "0")}`;
+}
+
 function loadStore() {
   if (!fs.existsSync(DB_PATH)) {
-    return { lastIndex: -1, lastPosted: null, history: [] };
+    return { lastIndex: -1, lastPosted: null, todayDecision: null, history: [] };
   }
   return JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
 }
@@ -22,6 +31,10 @@ function saveStore(store) {
   fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
   fs.writeFileSync(DB_PATH, JSON.stringify(store, null, 2), "utf8");
 }
+
+// Aliases used by run-once.js for explicit load/save control
+function loadDB()        { return Promise.resolve(loadStore()); }
+function saveDB(store)   { saveStore(store); return Promise.resolve(); }
 
 function initDB() {
   const store = loadStore();
@@ -40,7 +53,8 @@ function markThemeUsed(themeId, postText, linkedinId = null) {
   const store = loadStore();
   const theme = THEMES.find((t) => t.id === themeId);
   store.lastIndex = THEMES.indexOf(theme);
-  store.lastPosted = new Date().toISOString();
+  // Store as IST date string so "already posted today" check works correctly
+  store.lastPosted = getISTDateString();
   store.history.unshift({
     id: Date.now(),
     theme_id: themeId,
@@ -58,4 +72,4 @@ function getRecentPosts(limit = 10) {
   return store.history.slice(0, limit);
 }
 
-module.exports = { initDB, getNextTheme, markThemeUsed, getRecentPosts };
+module.exports = { initDB, getNextTheme, markThemeUsed, getRecentPosts, loadDB, saveDB };
