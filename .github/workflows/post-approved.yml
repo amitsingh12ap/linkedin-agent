@@ -1,0 +1,40 @@
+name: Post Approved
+
+on:
+  workflow_dispatch:   # triggered by the approve link (GitHub Pages → GitHub API)
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Post approved draft to LinkedIn
+        env:
+          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+          LINKEDIN_ACCESS_TOKEN:  ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN:    ${{ secrets.LINKEDIN_PERSON_URN }}
+          DB_PATH: ./data/agent.json
+          MODE: post
+        run: node src/run-once.js
+
+      - name: Commit updated state
+        run: |
+          git config user.name "linkedin-agent[bot]"
+          git config user.email "linkedin-agent@users.noreply.github.com"
+          git add data/agent.json
+          git diff --staged --quiet || git commit -m "chore: posted approved draft $(date +'%Y-%m-%d %H:%M')"
+          git push

@@ -1,13 +1,11 @@
-name: Daily LinkedIn Post
+name: Daily LinkedIn Draft
 
 on:
   schedule:
-    # Run every hour between 2:30 AM – 8:30 AM UTC (8 AM – 2 PM IST).
-    # The script itself randomly picks ONE hour in that window to actually post.
-    # It also randomly skips ~2 days per week — so posting looks organic, not bot-like.
+    # Runs every hour 8 AM–2 PM IST (2:30–8:30 AM UTC).
+    # Script internally picks one random hour in that window to generate + send WhatsApp approval.
     - cron: '30 2-8 * * *'
 
-  # Allow manual trigger from GitHub UI for testing
   workflow_dispatch:
     inputs:
       theme:
@@ -23,10 +21,10 @@ on:
         default: auto
 
 jobs:
-  post:
+  draft:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # needed to commit data/agent.json back
+      contents: write
 
     steps:
       - name: Checkout repo
@@ -41,19 +39,26 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run LinkedIn Agent
+      - name: Generate draft & send WhatsApp approval
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
-          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+          LINKEDIN_ACCESS_TOKEN:  ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN:    ${{ secrets.LINKEDIN_PERSON_URN }}
+          TWILIO_ACCOUNT_SID:     ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN:      ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_WHATSAPP_FROM:   ${{ secrets.TWILIO_WHATSAPP_FROM }}
+          WHATSAPP_TO:            ${{ secrets.WHATSAPP_TO }}
+          GITHUB_PAT:             ${{ secrets.GH_PAT }}
+          GITHUB_REPO:            amitsingh12ap/linkedin-agent
           DB_PATH: ./data/agent.json
+          MODE: draft
           THEME_OVERRIDE: ${{ github.event.inputs.theme }}
         run: node src/run-once.js
 
-      - name: Commit updated post history
+      - name: Commit updated state
         run: |
           git config user.name "linkedin-agent[bot]"
           git config user.email "linkedin-agent@users.noreply.github.com"
           git add data/agent.json
-          git diff --staged --quiet || git commit -m "chore: agent state $(date +'%Y-%m-%d %H:%M')"
+          git diff --staged --quiet || git commit -m "chore: draft state $(date +'%Y-%m-%d %H:%M')"
           git push
