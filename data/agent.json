@@ -1,5 +1,14 @@
 {
-  "lastIndex": -1,
-  "lastPosted": null,
-  "history": []
+  "lastIndex": 0,
+  "lastPosted": "2026-03-12T05:02:34.760Z",
+  "history": [
+    {
+      "id": 1773291754760,
+      "theme_id": "engineering-leadership",
+      "theme_name": "Engineering Leadership & Team Building",
+      "post_text": "Had to tell a senior engineer this week that his code reviews were killing team morale.\n\nNot the technical feedback — that was solid. It was the tone. Dismissive. Impatient. Making juniors feel stupid for asking questions.\n\nHe had no idea.\n\nTook him for chai, showed him three examples. His face changed. \"I thought I was being efficient,\" he said.\n\nHere's the thing: being right isn't enough. How you deliver matters as much as what you deliver.\n\nWe agreed on a reset. More context in comments. Assume good intent. Treat every review like you're teaching, not gatekeeping.\n\nTwo days later, a junior pinged me: \"His review actually helped me understand the why.\"\n\nThat's the job. Not just shipping features — shaping how your team treats each other. 🛠️\n\n#EngineeringLeadership #TeamCulture",
+      "posted_at": "2026-03-12T05:02:34.760Z",
+      "linkedin_id": "urn:li:share:7437724698798546944"
+    }
+  ]
 }
