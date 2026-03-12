@@ -10,5 +10,16 @@
       "posted_at": "2026-03-12T05:02:34.760Z",
       "linkedin_id": "urn:li:share:7437724698798546944"
     }
-  ]
+  ],
+  "todayDecision": {
+    "date": "2026-03-12",
+    "shouldPost": true,
+    "targetHour": 12
+  },
+  "pendingDraft": {
+    "draftId": "2026-03-12-1773331183047",
+    "themeId": "engineering-leadership",
+    "postText": "Had a tough conversation with one of my iOS leads yesterday. Performance dropped 20% over two sprints. His manager wanted to put him on a PIP immediately.\n\nI pushed back. Sat with him for an hour instead. Turns out he's been debugging a gnarly memory leak solo for weeks—no one knew. He didn't ask for help because he thought he'd figure it out.\n\nThat's on me as a leader, not him.\n\nMoved him to pair with our Android expert. Three days later, issue closed. Back to shipping.\n\nThe hard feedback wasn't about performance. It was about communication. He needed to know that asking for help is how we work here, not a weakness 🛠️\n\nCulture isn't built on what you say in all-hands. It's built on how you respond when someone struggles.\n\n#EngineeringLeadership #TeamBuilding #StartupLife",
+    "date": "2026-03-12"
+  }
 }
