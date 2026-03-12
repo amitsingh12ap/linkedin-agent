@@ -70,8 +70,8 @@ async function generatePost(theme) {
   });
 
   const message = await client.messages.create({
-    model: "claude-opus-4-5",
-    max_tokens: 500,
+    model: "claude-haiku-4-5-20251001",  // Haiku: same quality for constrained creative writing, ~20x cheaper than Opus
+    max_tokens: 300,                      // Post is <150 words (~200 tokens) — 300 is plenty
     system: VOICE_PROFILE,
     messages: [{
       role: "user",
