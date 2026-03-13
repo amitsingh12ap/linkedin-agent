@@ -17,11 +17,11 @@
     "targetHour": 13
   },
   "pendingDraft": {
-    "draftId": "2026-03-12-1773331550298",
-    "themeId": "engineering-leadership",
-    "postText": "India's engineering talent isn't winning because of IITs or boot camps. It's winning because we built systems *at scale* with broken infrastructure.\n\nWant to optimize for 100 million concurrent users on unreliable networks? You learn differently than someone building for stable, well-resourced environments. Constraints breed creativity. They also breed engineers who don't panic when things break.\n\nThe West is now hiring for exactly this mindset — people who've shipped products that *have* to work under pressure. Not theoretical excellence. Practical resilience.\n\nThe funny part? We're still exporting the talent instead of building the products here. We should be flipping that script. 🚀\n\n#EngineeringTalent #India #ProductBuilding",
-    "postType": "industry_take",
-    "date": "2026-03-12"
+    "draftId": "2026-03-13-1773388839387",
+    "themeId": "ai-productivity",
+    "postText": "Most engineering teams using AI are optimizing for the wrong thing.\n\nThey're chasing speed. Faster code generation, faster debugging, faster shipping. But the real leverage isn't velocity—it's decision quality.\n\nI've watched teams pump out features in half the time, then spend 3x longer fixing cascading problems because AI filled gaps in their architecture they didn't even know existed. The code \"worked,\" but it wasn't right.\n\nThe engineers who are winning? They're using AI as a thinking partner, not a code factory. They ask it hard questions about trade-offs. They argue with it. They use it to stress-test their own reasoning before writing anything.\n\nSpeed without clarity is just debt with better optics. 🎯\n\n#EngineeringLeadership #AI #SoftwareArchitecture",
+    "postType": "opinion",
+    "date": "2026-03-13"
   },
   "recentPostTypes": []
 }
