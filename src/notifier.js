@@ -1,65 +1,50 @@
 /**
  * WhatsApp notifier via Twilio.
- * Sends a post preview to Amit's WhatsApp with an approve link.
+ * Sends a post preview to Amit's WhatsApp with approve + decline links.
  */
 const axios = require("axios");
 require("dotenv").config();
 
-const TWILIO_ACCOUNT_SID  = process.env.TWILIO_ACCOUNT_SID;
-const TWILIO_AUTH_TOKEN   = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_WHATSAPP_FROM = process.env.TWILIO_WHATSAPP_FROM || "whatsapp:+14155238886"; // Twilio sandbox default
-const WHATSAPP_TO         = process.env.WHATSAPP_TO; // e.g. whatsapp:+919XXXXXXXXX
+const TWILIO_ACCOUNT_SID   = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH_TOKEN    = process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_WHATSAPP_FROM = process.env.TWILIO_WHATSAPP_FROM || "whatsapp:+14155238886";
+const WHATSAPP_TO          = process.env.WHATSAPP_TO;
+const GITHUB_REPO          = process.env.GITHUB_REPO || "amitsingh12ap/linkedin-agent";
+const GITHUB_PAT           = process.env.GITHUB_PAT;
 
-const GITHUB_REPO         = process.env.GITHUB_REPO || "amitsingh12ap/linkedin-agent";
-const GITHUB_PAT          = process.env.GITHUB_PAT;  // Personal Access Token with workflow scope
-
-/**
- * Triggers the post workflow via GitHub API.
- * This is what the approve endpoint calls.
- */
-async function triggerPostWorkflow() {
-  if (!GITHUB_PAT) throw new Error("GITHUB_PAT not set");
-  await axios.post(
-    `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/post-approved.yml/dispatches`,
-    { ref: "main" },
-    {
-      headers: {
-        Authorization: `Bearer ${GITHUB_PAT}`,
-        Accept: "application/vnd.github+json",
-      },
-    }
-  );
-}
+const BASE_URL = `https://amitsingh12ap.github.io/linkedin-agent`;
 
 /**
- * Sends a WhatsApp preview message with an approve link.
- * The approve link hits a GitHub Pages redirect that calls the GitHub API.
+ * Sends WhatsApp preview with ✅ Approve and ❌ Decline links.
  */
 async function sendApprovalRequest(postText, draftId) {
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
-    throw new Error("Twilio credentials not set (TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN)");
+    throw new Error("Twilio credentials not set");
   }
   if (!WHATSAPP_TO) {
-    throw new Error("WHATSAPP_TO not set (e.g. whatsapp:+919XXXXXXXXX)");
+    throw new Error("WHATSAPP_TO not set");
   }
 
-  // Approval link — triggers the post-approved workflow via GitHub API redirect page
-  const approveUrl = `https://amitsingh12ap.github.io/linkedin-agent/approve?token=${draftId}&pat=${GITHUB_PAT}&repo=${GITHUB_REPO}`;
-
-  const preview = postText.length > 400
-    ? postText.slice(0, 397) + "..."
+  const preview = postText.length > 500
+    ? postText.slice(0, 497) + "..."
     : postText;
 
+  const approveUrl = `${BASE_URL}/approve.html?pat=${GITHUB_PAT}&repo=${GITHUB_REPO}`;
+  const declineUrl = `${BASE_URL}/decline.html?pat=${GITHUB_PAT}&repo=${GITHUB_REPO}`;
+
   const body = [
-    `📝 *LinkedIn Post Ready for Approval*`,
+    `📝 *LinkedIn Post Ready*`,
     ``,
-    `${preview}`,
+    preview,
     ``,
     `──────────────────`,
-    `✅ Tap to approve & post:`,
+    `✅ *Approve & Post:*`,
     approveUrl,
     ``,
-    `⏰ Expires at midnight IST. No action = skipped today.`,
+    `❌ *Decline (skip today):*`,
+    declineUrl,
+    ``,
+    `⏰ Expires midnight IST.`,
   ].join("\n");
 
   const params = new URLSearchParams({
@@ -77,7 +62,7 @@ async function sendApprovalRequest(postText, draftId) {
     }
   );
 
-  console.log(`✅ WhatsApp approval request sent to ${WHATSAPP_TO}`);
+  console.log(`✅ WhatsApp sent to ${WHATSAPP_TO}`);
 }
 
-module.exports = { sendApprovalRequest, triggerPostWorkflow };
+module.exports = { sendApprovalRequest };
