@@ -2,9 +2,10 @@ name: Daily LinkedIn Draft
 
 on:
   schedule:
-    # Runs every hour 8 AM–2 PM IST (2:30–8:30 AM UTC).
-    # Script internally picks one random hour in that window to generate + send WhatsApp approval.
-    - cron: '30 2-8 * * *'
+    # Runs every hour 8 AM–1 PM IST (2:30–7:30 AM UTC), weekdays only.
+    # Script internally picks one random target hour in that window per day.
+    # Most runs are no-ops (agent checks time and skips). One run generates + WhatsApps.
+    - cron: '30 2-7 * * 1-5'
 
   workflow_dispatch:
     inputs:

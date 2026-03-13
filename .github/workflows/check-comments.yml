@@ -2,7 +2,9 @@ name: Check Comments
 
 on:
   schedule:
-    - cron: '0 4,8,12 * * 1-5'   # Mon-Fri at 9:30AM, 1:30PM, 5:30PM IST
+    # Mon–Fri at 11:00 AM, 3:00 PM, 6:00 PM IST (5:30, 9:30, 12:30 UTC)
+    # Staggered at :30 to avoid colliding with other :00 workflows
+    - cron: '30 5,9,12 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -14,4 +16,4 @@ jobs:
           curl -s -X POST "${{ secrets.WEBHOOK_SERVER_URL }}/webhook/comments" \
             -H "Content-Type: application/json" \
             -d '{}' \
-            --max-time 10 || echo "Server ping done"
+            --max-time 10 || echo "Server ping done (server may not be set up yet)"
