@@ -13,10 +13,9 @@ const THEMES = [
 
 function getISTDateString() {
   const now = new Date();
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-  const istMs = utcMs + 5.5 * 3600000;
-  const ist = new Date(istMs);
-  return `${ist.getFullYear()}-${String(ist.getMonth() + 1).padStart(2, "0")}-${String(ist.getDate()).padStart(2, "0")}`;
+  const istMs = now.getTime() + now.getTimezoneOffset() * 60000 + 5.5 * 3600000;
+  const d = new Date(istMs);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
 function loadStore() {
@@ -33,8 +32,8 @@ function saveStore(store) {
   fs.writeFileSync(DB_PATH, JSON.stringify(store, null, 2), "utf8");
 }
 
-function loadDB()        { return Promise.resolve(loadStore()); }
-function saveDB(store)   { saveStore(store); return Promise.resolve(); }
+function loadDB()       { return Promise.resolve(loadStore()); }
+function saveDB(store)  { saveStore(store); return Promise.resolve(); }
 
 function initDB() {
   const store = loadStore();
@@ -49,32 +48,34 @@ function getNextTheme() {
   return Promise.resolve(THEMES[nextIndex]);
 }
 
-// Returns last N post types so generator can avoid repeating them
 function getRecentPostTypes(n = 3) {
   const store = loadStore();
   return (store.recentPostTypes || []).slice(-n);
 }
 
-function markThemeUsed(themeId, postText, linkedinId = null, postType = null) {
+function markThemeUsed(themeId, postText, linkedinId = null, postType = null, approvedHour = null) {
   const store = loadStore();
   const theme = THEMES.find((t) => t.id === themeId);
-  store.lastIndex = THEMES.indexOf(theme);
+  store.lastIndex  = THEMES.indexOf(theme);
   store.lastPosted = getISTDateString();
 
-  // Track post type history for anti-repeat logic (keep last 5)
   if (postType) {
     store.recentPostTypes = [...(store.recentPostTypes || []), postType].slice(-5);
   }
 
   store.history.unshift({
     id: Date.now(),
-    theme_id: themeId,
-    theme_name: theme.name,
-    post_type: postType,
-    post_text: postText,
-    posted_at: new Date().toISOString(),
-    linkedin_id: linkedinId,
+    theme_id:      themeId,
+    theme_name:    theme?.name,
+    post_type:     postType,
+    post_text:     postText,
+    posted_at:     new Date().toISOString(),
+    linkedin_id:   linkedinId,
+    approved_hour: approvedHour, // IST hour — used for smart timing
   });
+
+  // Keep history trimmed to last 60 posts
+  store.history = store.history.slice(0, 60);
   saveStore(store);
   return Promise.resolve();
 }

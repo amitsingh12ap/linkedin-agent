@@ -1,6 +1,6 @@
 /**
  * WhatsApp notifier via Twilio.
- * Sends a post preview to Amit's WhatsApp with approve + decline links.
+ * Sends a post preview with ✅ Approve, ❌ Decline, 🔄 Regenerate links.
  */
 const axios = require("axios");
 require("dotenv").config();
@@ -11,26 +11,14 @@ const TWILIO_WHATSAPP_FROM = process.env.TWILIO_WHATSAPP_FROM || "whatsapp:+1415
 const WHATSAPP_TO          = process.env.WHATSAPP_TO;
 const GITHUB_REPO          = process.env.GITHUB_REPO || "amitsingh12ap/linkedin-agent";
 const GITHUB_PAT           = process.env.GITHUB_PAT;
+const BASE_URL             = `https://amitsingh12ap.github.io/linkedin-agent`;
 
-const BASE_URL = `https://amitsingh12ap.github.io/linkedin-agent`;
-
-/**
- * Sends WhatsApp preview with ✅ Approve and ❌ Decline links.
- */
 async function sendApprovalRequest(postText, draftId) {
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
-    throw new Error("Twilio credentials not set");
-  }
-  if (!WHATSAPP_TO) {
-    throw new Error("WHATSAPP_TO not set");
-  }
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) throw new Error("Twilio credentials not set");
+  if (!WHATSAPP_TO) throw new Error("WHATSAPP_TO not set");
 
-  const preview = postText.length > 500
-    ? postText.slice(0, 497) + "..."
-    : postText;
-
-  const approveUrl = `${BASE_URL}/approve.html?pat=${GITHUB_PAT}&repo=${GITHUB_REPO}`;
-  const declineUrl = `${BASE_URL}/decline.html?pat=${GITHUB_PAT}&repo=${GITHUB_REPO}`;
+  const preview = postText.length > 500 ? postText.slice(0, 497) + "..." : postText;
+  const q = `pat=${GITHUB_PAT}&repo=${GITHUB_REPO}`;
 
   const body = [
     `📝 *LinkedIn Post Ready*`,
@@ -39,10 +27,13 @@ async function sendApprovalRequest(postText, draftId) {
     ``,
     `──────────────────`,
     `✅ *Approve & Post:*`,
-    approveUrl,
+    `${BASE_URL}/approve.html?${q}`,
+    ``,
+    `🔄 *Try a different angle:*`,
+    `${BASE_URL}/regenerate.html?${q}`,
     ``,
     `❌ *Decline (skip today):*`,
-    declineUrl,
+    `${BASE_URL}/decline.html?${q}`,
     ``,
     `⏰ Expires midnight IST.`,
   ].join("\n");
@@ -61,7 +52,6 @@ async function sendApprovalRequest(postText, draftId) {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
     }
   );
-
   console.log(`✅ WhatsApp sent to ${WHATSAPP_TO}`);
 }
 

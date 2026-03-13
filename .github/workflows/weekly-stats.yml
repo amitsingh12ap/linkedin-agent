@@ -1,0 +1,26 @@
+name: Weekly Stats
+
+on:
+  schedule:
+    - cron: '0 5 * * 0'   # Every Sunday 10:30 AM IST (5:00 UTC)
+  workflow_dispatch:        # Manual trigger for testing
+
+jobs:
+  weekly-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+
+      - name: Send weekly stats via WhatsApp
+        env:
+          TWILIO_ACCOUNT_SID:   ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN:    ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_WHATSAPP_FROM: ${{ secrets.TWILIO_WHATSAPP_FROM }}
+          WHATSAPP_TO:          ${{ secrets.WHATSAPP_TO }}
+          DB_PATH: ./data/agent.json
+        run: node src/weekly-stats.js
