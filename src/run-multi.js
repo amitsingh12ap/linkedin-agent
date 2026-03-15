@@ -64,14 +64,16 @@ async function main() {
   logger.info(`   Time: ${new Date().toISOString()}`);
 
   const data  = loadUsers();
-  let users   = data.users.filter(u => u.active);
+  // TARGET_USER bypasses the active filter — useful for testing paused users
+  let users = targetUser
+    ? data.users.filter(u => u.id === targetUser)
+    : data.users.filter(u => u.active);
 
-  if (targetUser) {
-    users = users.filter(u => u.id === targetUser);
-    if (users.length === 0) {
-      logger.error(`❌ No active user found with id: ${targetUser}`);
-      process.exit(1);
-    }
+  if (users.length === 0) {
+    logger.error(targetUser
+      ? `❌ No user found with id: ${targetUser}`
+      : `❌ No active users found`);
+    process.exit(1);
   }
 
   logger.info(`📋 Processing ${users.length} active user(s)...\n`);
