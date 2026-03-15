@@ -2,6 +2,6 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "node src/agent.js"
+startCommand = "node server/index.js"
 restartPolicyType = "always"
-healthcheckPath = "/"
+healthcheckPath = "/health"
