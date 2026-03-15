@@ -1,0 +1,59 @@
+name: Daily LinkedIn Post (Multi-User)
+
+on:
+  schedule:
+    - cron: '30 3 * * *'   # 9:00 AM IST daily
+  workflow_dispatch:
+    inputs:
+      user_id:
+        description: 'Run for specific user ID only (blank = all active users)'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Dry run — generate but do NOT publish'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+      theme_override:
+        description: 'Override theme (engineering-leadership | ai-productivity | streaming-tech | personal-growth)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  post-multi:
+    runs-on: ubuntu-latest
+    name: Post for all active users
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run multi-user agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          TARGET_USER: ${{ github.event.inputs.user_id || '' }}
+          THEME_OVERRIDE: ${{ github.event.inputs.theme_override || '' }}
+        run: node src/run-multi.js
+
+      - name: Commit updated state
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config --global user.name 'LinkedIn Agent Bot'
+          git config --global user.email 'bot@linkedin-agent'
+          git add data/users.json
+          git diff --staged --quiet || git commit -m "chore: update post history [skip ci]"
+          git push

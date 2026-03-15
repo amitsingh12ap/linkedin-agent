@@ -10,7 +10,10 @@
     "history": "node scripts/history.js",
     "get-urn": "node scripts/get-person-urn.js",
     "weekly-stats": "node src/weekly-stats.js",
-    "server:dev": "NODE_ENV=development node server/index.js"
+    "server:dev": "NODE_ENV=development node server/index.js",
+    "post-multi": "node src/run-multi.js",
+    "post-multi:dry": "DRY_RUN=true node src/run-multi.js",
+    "post-multi:user": "node src/run-multi.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.0",

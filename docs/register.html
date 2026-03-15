@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>LinkedIn Agent — Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0a0a0f;--s:#111118;--b:#1e1e2e;--a:#0A66C2;--as:rgba(10,102,194,.12);--g:#00c896;--gs:rgba(0,200,150,.1);--t:#e8e8f0;--m:#6b6b80;--mono:'DM Mono',monospace;--sans:'Syne',sans-serif}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--t);font-family:var(--sans);min-height:100vh;padding:3rem 1.5rem}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(10,102,194,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(10,102,194,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+    .wrap{max-width:600px;margin:0 auto;position:relative;z-index:1}
+    .steps{display:flex;align-items:center;margin-bottom:2.5rem;font-family:var(--mono);font-size:.7rem;color:var(--m)}
+    .step{display:flex;align-items:center;gap:.5rem}
+    .sn{width:22px;height:22px;border-radius:50%;border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:.65rem}
+    .step.done .sn{background:var(--g);border-color:var(--g);color:#000}
+    .step.act .sn{background:var(--a);border-color:var(--a);color:#fff}
+    .sl{flex:1;height:1px;background:var(--b);margin:0 .75rem}
+    h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem}
+    h1 span{color:var(--a)}
+    .head-sub{color:var(--m);font-size:.88rem;line-height:1.6;margin-bottom:2rem}
+    .info{background:var(--as);border:1px solid rgba(10,102,194,.2);border-radius:10px;padding:1rem 1.25rem;font-size:.8rem;color:#7ab3e8;line-height:1.6;margin-bottom:1.5rem}
+    .info strong{color:var(--t)}
+    .card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:2rem;margin-bottom:1rem}
+    .clabel{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem}
+    .clabel::after{content:'';flex:1;height:1px;background:var(--b)}
+    .field{margin-bottom:1.25rem}
+    .field:last-child{margin-bottom:0}
+    .field label{font-size:.75rem;font-family:var(--mono);color:var(--m);display:flex;justify-content:space-between;margin-bottom:.4rem}
+    .req{color:var(--a);font-size:.65rem}
+    .field input,.field textarea{width:100%;background:#07070c;border:1px solid var(--b);border-radius:8px;padding:.8rem 1rem;color:var(--t);font-family:var(--mono);font-size:.8rem;outline:none;transition:border-color .2s}
+    .field input:focus,.field textarea:focus{border-color:var(--a)}
+    .field input::placeholder,.field textarea::placeholder{color:#3a3a4f}
+    .field textarea{resize:vertical;min-height:90px}
+    .hint{font-size:.72rem;color:var(--m);margin-top:.35rem;font-family:var(--mono)}
+    .hint a{color:var(--a);text-decoration:none}
+    .urn-cmd{background:#07070c;border:1px solid var(--b);border-radius:6px;padding:.45rem .75rem;font-family:var(--mono);font-size:.7rem;color:#a8d8a8;margin-top:.4rem}
+    .pre-fill{background:var(--gs);border:1px solid rgba(0,200,150,.2);border-radius:8px;padding:.6rem .9rem;font-family:var(--mono);font-size:.75rem;color:var(--g);display:none;margin-bottom:1rem}
+    .theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+    .topt{background:#07070c;border:1px solid var(--b);border-radius:8px;padding:.7rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;font-size:.8rem;transition:all .2s}
+    .topt:hover{border-color:var(--a)}
+    .topt.sel{border-color:var(--a);background:var(--as)}
+    .topt input{accent-color:var(--a);width:14px;height:14px}
+    .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:.9rem;border-radius:10px;font-family:var(--sans);font-size:.9rem;font-weight:700;cursor:pointer;border:none;background:var(--a);color:#fff;transition:all .2s;margin-top:1.5rem}
+    .btn:hover{background:#0855a5;transform:translateY(-1px)}
+    .btn-back{display:block;text-align:center;margin-top:.75rem;background:none;border:1px solid var(--b);border-radius:10px;padding:.75rem;color:var(--m);font-family:var(--sans);font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none}
+    .btn-back:hover{border-color:var(--a);color:var(--t)}
+    #success{display:none;text-align:center;padding:2rem 0}
+    .sico{width:60px;height:60px;background:var(--gs);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1.5rem;animation:pop .4s ease}
+    @keyframes pop{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+    #success h2{font-size:1.5rem;font-weight:800;margin-bottom:.5rem}
+    #success p{color:var(--m);font-size:.85rem;line-height:1.6}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="steps">
+    <div class="step done"><div class="sn">✓</div><span>Authorize</span></div>
+    <div class="sl"></div>
+    <div class="step done"><div class="sn">✓</div><span>Get Token</span></div>
+    <div class="sl"></div>
+    <div class="step act"><div class="sn">3</div><span>Register</span></div>
+  </div>
+  <h1>Set up your <span>daily post.</span></h1>
+  <p class="head-sub">Tell the agent about you. It'll post in your voice every morning at 9 AM IST.</p>
+  <div id="form-state">
+    <div class="info"><strong>Closed beta.</strong> Once you submit, the admin will review and activate your account within 24 hours. Posts start the next morning.</div>
+    <div class="card">
+      <div class="clabel">01 — Your Identity</div>
+      <div class="field"><label>Full Name <span class="req">required</span></label><input type="text" id="f-name" placeholder="Amit Singh"/></div>
+      <div class="field"><label>LinkedIn Profile URL <span class="req">required</span></label><input type="url" id="f-linkedin" placeholder="https://linkedin.com/in/yourprofile"/></div>
+      <div class="field">
+        <label>Person URN <span class="req">required</span></label>
+        <input type="text" id="f-urn" placeholder="urn:li:person:ABC123xyz"/>
+        <div class="hint">Get it by running:<div class="urn-cmd">LINKEDIN_ACCESS_TOKEN=your_token npm run get-urn</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="clabel">02 — LinkedIn Access</div>
+      <div class="pre-fill" id="pfill">✓ Access token auto-filled from previous step</div>
+      <div class="field"><label>Access Token <span class="req">required</span></label><textarea id="f-token" rows="3" placeholder="AQX... paste your LinkedIn access token"></textarea><div class="hint">Expires every 60 days — you'll need to re-register when it does.</div></div>
+    </div>
+    <div class="card">
+      <div class="clabel">03 — Your Voice</div>
+      <div class="field"><label>Your Role & Company</label><input type="text" id="f-role" placeholder="Director of Engineering at JioStar"/></div>
+      <div class="field"><label>3–5 of your best past LinkedIn posts</label><textarea id="f-voice" rows="6" placeholder="Paste your best posts here. The more specific, the better Claude will clone your writing style..."></textarea><div class="hint">This is what makes the AI sound like <em>you</em>, not a generic robot.</div></div>
+    </div>
+    <div class="card">
+      <div class="clabel">04 — Content Themes</div>
+      <p style="font-size:.8rem;color:var(--m);margin-bottom:1rem">Select themes to rotate through (all selected by default)</p>
+      <div class="theme-grid">
+        <label class="topt sel"><input type="checkbox" value="engineering-leadership" checked/> 🏗️ Engineering Leadership</label>
+        <label class="topt sel"><input type="checkbox" value="ai-productivity" checked/> 🤖 AI & Productivity</label>
+        <label class="topt sel"><input type="checkbox" value="streaming-tech" checked/> 📺 Streaming & Media</label>
+        <label class="topt sel"><input type="checkbox" value="personal-growth" checked/> 🌱 Personal Growth</label>
+      </div>
+    </div>
+    <button class="btn" onclick="submit()">Submit Registration →</button>
+    <a href="index.html" class="btn-back">← Back to start</a>
+  </div>
+  <div class="card" id="success">
+    <div class="sico">🚀</div>
+    <h2>You're on the list.</h2>
+    <p>Registration submitted. The admin will review and activate your account within 24 hours.<br/><br/>Your first AI-generated post will go out the next morning at <strong>9:00 AM IST</strong>.</p>
+    <a href="index.html" style="display:block;margin-top:1.5rem;color:var(--m);font-size:.8rem;font-family:var(--mono);text-align:center">← Back to home</a>
+  </div>
+</div>
+<script>
+  window.onload=function(){
+    const t=sessionStorage.getItem('li_token');
+    if(t){document.getElementById('f-token').value=t;document.getElementById('pfill').style.display='block'}
+    document.querySelectorAll('.topt input').forEach(cb=>{
+      cb.addEventListener('change',function(){this.closest('.topt').classList.toggle('sel',this.checked)});
+    });
+  };
+  function submit(){
+    const name=document.getElementById('f-name').value.trim();
+    const li=document.getElementById('f-linkedin').value.trim();
+    const urn=document.getElementById('f-urn').value.trim();
+    const tok=document.getElementById('f-token').value.trim();
+    if(!name||!li||!urn||!tok){alert('Please fill in all required fields: Name, LinkedIn URL, Person URN, and Access Token.');return}
+    const role=document.getElementById('f-role').value.trim();
+    const voice=document.getElementById('f-voice').value.trim();
+    const themes=Array.from(document.querySelectorAll('.topt input:checked')).map(c=>c.value);
+    const body=`## New LinkedIn Agent Registration\n\n**Name:** ${name}\n**LinkedIn:** ${li}\n**Person URN:** ${urn}\n**Role:** ${role||'Not specified'}\n**Themes:** ${themes.join(', ')}\n\n### Access Token\n\`\`\`\n${tok}\n\`\`\`\n\n### Voice Profile\n${voice||'Not provided — will use default voice.'}\n\n---\n*Submitted via linkedin-agent registration form*`;
+    const url=`https://github.com/amitsingh12ap/linkedin-agent/issues/new?title=${encodeURIComponent('[Register] '+name)}&body=${encodeURIComponent(body)}&labels=registration`;
+    sessionStorage.removeItem('li_token');sessionStorage.removeItem('li_code');
+    window.open(url,'_blank');
+    document.getElementById('form-state').style.display='none';
+    document.getElementById('success').style.display='block';
+  }
+</script>
+</body>
+</html>

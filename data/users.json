@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "id": "amit",
+      "name": "Amit Singh",
+      "personUrn": "urn:li:person:HKPH7xoE1O",
+      "accessToken": "AQV4-GCk_ayv7L85KZUDsoXsOaDQQGIkAwPW5f4367gceW-9O8N-7EEbM2IvJ9qBCDW2MlMKth4HoXsVeAmxhYnRMwsmvmxdbCqDz-nly57mqNkc5mpfj4ky4xb6k6lLdc4F_vnvraclHWzS-jgssUMclx6oWuyvLe7IP0YKZ8WVq3KI6n39u6aHB3uI1E0lMWwreEzStOSWKSAxBiAc9t6AdyEnDL-tpbYCNB_8brzUWqCOR3urMSJlgzLxeqr3S-0XYd0BvhO8O2HYIXdl7KRjS3WkMwiRKSP_22hHI8HiWBTYMu4uJhi2RpA9iHeVxzbzs__n8qCjbkydZTHjYEUCCU2rpQ",
+      "tokenExpiry": "2026-05-15",
+      "role": "Director of Engineering at JioStar — leads iOS, Android & Web player/SSAI teams (22 people).",
+      "voiceProfile": "Short, punchy sentences. First-person, conversational. No fluff or corporate-speak. Under 150 words. Bold hook line to open. Ends with a reflection, not a CTA. 2-3 emojis max. 2-3 hashtags at the end only.",
+      "themes": ["engineering-leadership", "ai-productivity", "streaming-tech", "personal-growth"],
+      "currentThemeIndex": 0,
+      "active": true,
+      "addedOn": "2026-03-15",
+      "postHistory": []
+    }
+  ]
+}

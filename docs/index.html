@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedIn Agent — Daily Posts, Zero Effort</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#0a0a0f;--surface:#111118;--border:#1e1e2e;--accent:#0A66C2;--as:rgba(10,102,194,.12);--green:#00c896;--gs:rgba(0,200,150,.1);--text:#e8e8f0;--muted:#6b6b80;--mono:'DM Mono',monospace;--sans:'Syne',sans-serif}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(10,102,194,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(10,102,194,.04) 1px,transparent 1px);background-size:56px 56px;pointer-events:none}
+    nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:1.5rem 2.5rem;border-bottom:1px solid var(--border)}
+    .logo{font-family:var(--mono);font-size:.85rem;display:flex;align-items:center;gap:.5rem}
+    .dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:blink 2s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .badge{font-family:var(--mono);font-size:.68rem;background:var(--gs);color:var(--green);border:1px solid rgba(0,200,150,.2);padding:.3rem .75rem;border-radius:20px}
+    .hero{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:6rem 2rem 4rem;text-align:center}
+    .tag{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.72rem;color:var(--accent);background:var(--as);border:1px solid rgba(10,102,194,.2);padding:.35rem 1rem;border-radius:20px;margin-bottom:2rem;letter-spacing:.05em}
+    h1{font-size:clamp(2.4rem,6vw,3.8rem);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:1.5rem}
+    h1 .g{background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .sub{font-size:1rem;color:var(--muted);line-height:1.7;max-width:460px;margin:0 auto 3rem}
+    .cta-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem}
+    .btn-li{display:inline-flex;align-items:center;gap:.75rem;background:var(--accent);color:#fff;padding:1rem 2.25rem;border-radius:12px;font-family:var(--sans);font-size:1rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+    .btn-li:hover{background:#0855a5;transform:translateY(-2px);box-shadow:0 12px 40px rgba(10,102,194,.3)}
+    .li-icon{width:20px;height:20px;background:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center}
+    .li-icon svg{width:14px;height:14px;fill:var(--accent)}
+    .note{font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+    .section{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:3rem 2rem}
+    .slabel{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:2rem;display:flex;align-items:center;gap:1rem}
+    .slabel::after{content:'';flex:1;height:1px;background:var(--border)}
+    .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:3rem}
+    @media(max-width:600px){.flow{grid-template-columns:1fr 1fr}}
+    .fstep{background:var(--surface);padding:1.5rem 1.25rem}
+    .fnum{font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-bottom:.75rem}
+    .ficon{font-size:1.4rem;margin-bottom:.6rem}
+    .ftitle{font-size:.88rem;font-weight:700;margin-bottom:.35rem}
+    .fdesc{font-size:.76rem;color:var(--muted);line-height:1.5}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:3rem}
+    @media(max-width:600px){.features{grid-template-columns:1fr}}
+    .feat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.4rem;transition:border-color .2s}
+    .feat:hover{border-color:var(--accent)}
+    .feat .icon{font-size:1.2rem;margin-bottom:.6rem}
+    .feat .title{font-size:.88rem;font-weight:700;margin-bottom:.3rem}
+    .feat .desc{font-size:.76rem;color:var(--muted);line-height:1.5}
+    .bcta{text-align:center;padding:4rem 2rem;border-top:1px solid var(--border);position:relative;z-index:1}
+    .bcta h2{font-size:1.8rem;font-weight:800;margin-bottom:.75rem}
+    .bcta p{color:var(--muted);font-size:.88rem;margin-bottom:2rem}
+    footer{text-align:center;padding:2rem;border-top:1px solid var(--border);font-family:var(--mono);font-size:.7rem;color:var(--muted);position:relative;z-index:1}
+    footer a{color:var(--accent);text-decoration:none}
+    .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:100;align-items:center;justify-content:center;padding:1.5rem}
+    .modal-ov.open{display:flex}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2.5rem;max-width:440px;width:100%;position:relative}
+    .modal h3{font-size:1.25rem;font-weight:800;margin-bottom:.5rem}
+    .modal p{color:var(--muted);font-size:.83rem;line-height:1.6;margin-bottom:1.5rem}
+    .mc{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem}
+    .mf{margin-bottom:1rem}
+    .mf label{font-family:var(--mono);font-size:.72rem;color:var(--muted);display:block;margin-bottom:.4rem}
+    .mf input{width:100%;background:#07070c;border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;color:var(--text);font-family:var(--mono);font-size:.82rem;outline:none}
+    .mf input:focus{border-color:var(--accent)}
+    .btn-full{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.9rem;border-radius:10px;font-family:var(--sans);font-size:.9rem;font-weight:700;cursor:pointer;border:none;background:var(--accent);color:#fff;transition:all .2s}
+    .btn-full:hover{background:#0855a5}
+    .mlink{display:block;margin-top:.75rem;font-size:.72rem;color:var(--muted);font-family:var(--mono);text-align:center}
+    .mlink a{color:var(--accent);text-decoration:none}
+  </style>
+</head>
+<body>
+<nav>
+  <div class="logo"><div class="dot"></div>linkedin-agent</div>
+  <div class="badge">closed beta</div>
+</nav>
+<div class="hero">
+  <div class="tag">⚡ Powered by Claude AI · GitHub Actions</div>
+  <h1>Your LinkedIn.<br/><span class="g">On autopilot.</span></h1>
+  <p class="sub">One leadership post every morning at 9 AM IST — written in your voice, published automatically. Zero effort.</p>
+  <div class="cta-wrap">
+    <button class="btn-li" onclick="openModal()">
+      <div class="li-icon"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+      Connect LinkedIn Account
+    </button>
+    <span class="note">Takes 3 minutes · Closed beta · Admin approval required</span>
+  </div>
+</div>
+<div class="section">
+  <div class="slabel">How it works</div>
+  <div class="flow">
+    <div class="fstep"><div class="fnum">01</div><div class="ficon">🔗</div><div class="ftitle">Connect</div><div class="fdesc">Authorize via LinkedIn OAuth. One-time setup.</div></div>
+    <div class="fstep"><div class="fnum">02</div><div class="ficon">🎙️</div><div class="ftitle">Train voice</div><div class="fdesc">Paste 3–5 of your best posts. Claude learns your style.</div></div>
+    <div class="fstep"><div class="fnum">03</div><div class="ficon">⚙️</div><div class="ftitle">Admin activates</div><div class="fdesc">Repo owner reviews and adds you to the roster.</div></div>
+    <div class="fstep"><div class="fnum">04</div><div class="ficon">📬</div><div class="ftitle">Posts daily</div><div class="fdesc">Every morning at 9 AM IST. 4 rotating themes.</div></div>
+  </div>
+  <div class="slabel">Why it works</div>
+  <div class="features">
+    <div class="feat"><div class="icon">🧠</div><div class="title">Voice cloning</div><div class="desc">Claude reads your writing samples and generates posts that sound unmistakably like you.</div></div>
+    <div class="feat"><div class="icon">🔄</div><div class="title">Theme rotation</div><div class="desc">4 themes keep content diverse — Leadership, AI, Streaming tech, Personal growth.</div></div>
+    <div class="feat"><div class="icon">🆓</div><div class="title">Runs free</div><div class="desc">100% GitHub Actions. No servers, no hosting costs. Completely free infrastructure.</div></div>
+  </div>
+</div>
+<div class="bcta">
+  <h2>Ready to start?</h2>
+  <p>Connect your LinkedIn and we'll take care of the rest.</p>
+  <button class="btn-li" onclick="openModal()">
+    <div class="li-icon"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+    Connect LinkedIn Account
+  </button>
+</div>
+<footer>Built by <a href="https://github.com/amitsingh12ap">amitsingh12ap</a> · Powered by Claude + GitHub Actions · <a href="https://github.com/amitsingh12ap/linkedin-agent">Source</a></footer>
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <button class="mc" onclick="closeModal()">✕</button>
+    <h3>Before we start</h3>
+    <p>Enter your LinkedIn App Client ID to kick off the OAuth flow. This stays in your browser only.</p>
+    <div class="mf"><label>LinkedIn App Client ID</label><input type="text" id="cid" placeholder="86xxxxxxxxxxxxxxxx" /></div>
+    <button class="btn-full" onclick="startOAuth()">Start OAuth Flow →</button>
+    <p class="mlink">No LinkedIn App? <a href="https://www.linkedin.com/developers/apps" target="_blank">Create one here →</a></p>
+  </div>
+</div>
+<script>
+  function openModal(){document.getElementById('modal').classList.add('open')}
+  function closeModal(){document.getElementById('modal').classList.remove('open')}
+  document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+  function startOAuth(){
+    const clientId=document.getElementById('cid').value.trim();
+    if(!clientId){alert('Please enter your LinkedIn App Client ID.');return;}
+    const state=Math.random().toString(36).substring(2,15);
+    sessionStorage.setItem('oauth_state',state);
+    sessionStorage.setItem('client_id',clientId);
+    const base=window.location.origin+window.location.pathname.replace('index.html','');
+    const redirect=base+'callback.html';
+    const params=new URLSearchParams({response_type:'code',client_id:clientId,redirect_uri:redirect,state,scope:'openid profile w_member_social'});
+    window.location.href='https://www.linkedin.com/oauth/v2/authorization?'+params.toString();
+  }
+</script>
+</body>
+</html>
