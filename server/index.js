@@ -64,13 +64,17 @@ app.post("/auth/linkedin/token", async (req, res) => {
 
     const { access_token, expires_in } = tokenRes.data;
 
-    // Step 2: Fetch person URN using the token
-    const meRes = await axios.get("https://api.linkedin.com/v2/me", {
-      headers: { Authorization: `Bearer ${access_token}` },
+    // Step 2: Fetch person URN using the token (LinkedIn requires versioned API)
+    const meRes = await axios.get("https://api.linkedin.com/v2/userinfo", {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "LinkedIn-Version": "202304",
+      },
     });
 
-    const person_urn = `urn:li:person:${meRes.data.id}`;
-    const name       = `${meRes.data.localizedFirstName} ${meRes.data.localizedLastName}`;
+    // userinfo returns sub = person ID (from OpenID Connect)
+    const person_urn = `urn:li:person:${meRes.data.sub}`;
+    const name       = meRes.data.name || `${meRes.data.given_name || ""} ${meRes.data.family_name || ""}`.trim();
 
     return res.json({ access_token, person_urn, name, expires_in });
 
