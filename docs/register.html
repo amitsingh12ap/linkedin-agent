@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>LinkedIn Agent — Register v2</title>
+  <title>LinkedIn Agent — Register</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <style>
     :root{--bg:#0a0a0f;--s:#111118;--b:#1e1e2e;--a:#0A66C2;--as:rgba(10,102,194,.12);--g:#00c896;--gs:rgba(0,200,150,.1);--t:#e8e8f0;--m:#6b6b80;--mono:'DM Mono',monospace;--sans:'Syne',sans-serif}
@@ -125,7 +128,7 @@
     const li=document.getElementById('f-linkedin').value.trim();
     const urn=document.getElementById('f-urn').value.trim();
     const tok=document.getElementById('f-token').value.trim();
-    if(!name||!li||!urn||!tok){alert('Please fill in: Name, LinkedIn URL, Person URN, and Access Token.');return}
+    if(!name||!urn||!tok){alert('Please fill in: Name, Person URN, and Access Token.');return}
 
     const role=document.getElementById('f-role').value.trim();
     const voice=document.getElementById('f-voice').value.trim();
