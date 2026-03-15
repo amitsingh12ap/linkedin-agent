@@ -104,29 +104,21 @@
   </button>
 </div>
 <footer>Built by <a href="https://github.com/amitsingh12ap">amitsingh12ap</a> · Powered by Claude + GitHub Actions · <a href="https://github.com/amitsingh12ap/linkedin-agent">Source</a></footer>
-<div class="modal-ov" id="modal">
-  <div class="modal">
-    <button class="mc" onclick="closeModal()">✕</button>
-    <h3>Before we start</h3>
-    <p>Enter your LinkedIn App Client ID to kick off the OAuth flow. This stays in your browser only.</p>
-    <div class="mf"><label>LinkedIn App Client ID</label><input type="text" id="cid" placeholder="86xxxxxxxxxxxxxxxx" /></div>
-    <button class="btn-full" onclick="startOAuth()">Start OAuth Flow →</button>
-    <p class="mlink">No LinkedIn App? <a href="https://www.linkedin.com/developers/apps" target="_blank">Create one here →</a></p>
-  </div>
-</div>
 <script>
-  function openModal(){document.getElementById('modal').classList.add('open')}
-  function closeModal(){document.getElementById('modal').classList.remove('open')}
-  document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+  // ── CONFIG: paste your LinkedIn App Client ID once here ──────────────────
+  const LINKEDIN_CLIENT_ID = 'YOUR_CLIENT_ID_HERE';
+  // ─────────────────────────────────────────────────────────────────────────
+
+  function openModal(){startOAuth()}  // no modal needed anymore
   function startOAuth(){
-    const clientId=document.getElementById('cid').value.trim();
-    if(!clientId){alert('Please enter your LinkedIn App Client ID.');return;}
+    if(!LINKEDIN_CLIENT_ID || LINKEDIN_CLIENT_ID === 'YOUR_CLIENT_ID_HERE'){
+      alert('Admin: please set LINKEDIN_CLIENT_ID in docs/index.html');return;
+    }
     const state=Math.random().toString(36).substring(2,15);
     sessionStorage.setItem('oauth_state',state);
-    sessionStorage.setItem('client_id',clientId);
     const base=window.location.origin+window.location.pathname.replace('index.html','');
     const redirect=base+'callback.html';
-    const params=new URLSearchParams({response_type:'code',client_id:clientId,redirect_uri:redirect,state,scope:'openid profile w_member_social'});
+    const params=new URLSearchParams({response_type:'code',client_id:LINKEDIN_CLIENT_ID,redirect_uri:redirect,state,scope:'openid profile w_member_social'});
     window.location.href='https://www.linkedin.com/oauth/v2/authorization?'+params.toString();
   }
 </script>
