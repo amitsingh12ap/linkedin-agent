@@ -85,7 +85,60 @@ app.post("/auth/linkedin/token", async (req, res) => {
   }
 });
 
-// ── WhatsApp Webhook ──────────────────────────────────────────────────────────
+// ── Registration — creates GitHub Issue on behalf of user ─────────────────────
+app.post("/auth/register", async (req, res) => {
+  const { name, linkedin, urn, token, role, voice, themes } = req.body;
+
+  if (!name || !urn || !token) {
+    return res.status(400).json({ error: "Missing required fields: name, urn, token" });
+  }
+
+  const githubToken = process.env.GITHUB_TOKEN;
+  if (!githubToken) {
+    return res.status(500).json({ error: "Server missing GITHUB_TOKEN" });
+  }
+
+  const issueBody = `## New LinkedIn Agent Registration
+
+**Name:** ${name}
+**LinkedIn:** ${linkedin || "Not provided"}
+**Person URN:** ${urn}
+**Role:** ${role || "Not specified"}
+**Themes:** ${(themes || []).join(", ")}
+
+### Access Token
+\`\`\`
+${token}
+\`\`\`
+
+### Voice Profile
+${voice || "Not provided — will use default voice."}
+
+---
+*Submitted via linkedin-agent registration form*`;
+
+  try {
+    const response = await axios.post(
+      "https://api.github.com/repos/amitsingh12ap/linkedin-agent/issues",
+      { title: `[Register] ${name}`, body: issueBody, labels: ["registration"] },
+      {
+        headers: {
+          Authorization: `Bearer ${githubToken}`,
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      }
+    );
+    console.log(`[auth/register] Issue created: #${response.data.number} for ${name}`);
+    return res.json({ ok: true, issue: response.data.number, url: response.data.html_url });
+  } catch (err) {
+    const detail = err.response?.data || err.message;
+    console.error("[auth/register] Error:", detail);
+    return res.status(500).json({ error: "Failed to create registration", detail });
+  }
+});
+
+
 app.post("/webhook/whatsapp", async (req, res) => {
   res.sendStatus(200);
   try { await handleWhatsAppMessage(req.body); }

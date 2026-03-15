@@ -106,6 +106,8 @@
   </div>
 </div>
 <script>
+  const RAILWAY_URL = 'https://linkedin-agent-production-f234.up.railway.app';
+
   window.onload=function(){
     const t=sessionStorage.getItem('li_token');
     const u=sessionStorage.getItem('li_urn');
@@ -117,21 +119,39 @@
       cb.addEventListener('change',function(){this.closest('.topt').classList.toggle('sel',this.checked)});
     });
   };
-  function submit(){
+
+  async function submit(){
     const name=document.getElementById('f-name').value.trim();
     const li=document.getElementById('f-linkedin').value.trim();
     const urn=document.getElementById('f-urn').value.trim();
     const tok=document.getElementById('f-token').value.trim();
-    if(!name||!li||!urn||!tok){alert('Please fill in all required fields: Name, LinkedIn URL, Person URN, and Access Token.');return}
+    if(!name||!li||!urn||!tok){alert('Please fill in: Name, LinkedIn URL, Person URN, and Access Token.');return}
+
     const role=document.getElementById('f-role').value.trim();
     const voice=document.getElementById('f-voice').value.trim();
     const themes=Array.from(document.querySelectorAll('.topt input:checked')).map(c=>c.value);
-    const body=`## New LinkedIn Agent Registration\n\n**Name:** ${name}\n**LinkedIn:** ${li}\n**Person URN:** ${urn}\n**Role:** ${role||'Not specified'}\n**Themes:** ${themes.join(', ')}\n\n### Access Token\n\`\`\`\n${tok}\n\`\`\`\n\n### Voice Profile\n${voice||'Not provided — will use default voice.'}\n\n---\n*Submitted via linkedin-agent registration form*`;
-    const url=`https://github.com/amitsingh12ap/linkedin-agent/issues/new?title=${encodeURIComponent('[Register] '+name)}&body=${encodeURIComponent(body)}&labels=registration`;
-    sessionStorage.removeItem('li_token');sessionStorage.removeItem('li_code');
-    window.open(url,'_blank');
-    document.getElementById('form-state').style.display='none';
-    document.getElementById('success').style.display='block';
+
+    const btn=document.querySelector('.btn');
+    btn.textContent='Submitting...';btn.disabled=true;
+
+    try {
+      const res=await fetch(`${RAILWAY_URL}/auth/register`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name,linkedin:li,urn,token:tok,role,voice,themes})
+      });
+      const data=await res.json();
+      if(!res.ok) throw new Error(data.error||'Submission failed');
+
+      sessionStorage.removeItem('li_token');
+      sessionStorage.removeItem('li_urn');
+      sessionStorage.removeItem('li_name');
+      document.getElementById('form-state').style.display='none';
+      document.getElementById('success').style.display='block';
+    } catch(err) {
+      btn.textContent='Submit Registration →';btn.disabled=false;
+      alert('Error: '+err.message+'\n\nPlease try again.');
+    }
   }
 </script>
 </body>
