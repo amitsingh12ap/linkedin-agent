@@ -9,94 +9,136 @@
     *{box-sizing:border-box;margin:0;padding:0}
     body{background:var(--bg);color:var(--t);font-family:var(--sans);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
     body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(10,102,194,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(10,102,194,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
-    .wrap{width:100%;max-width:580px;z-index:1}
+    .wrap{width:100%;max-width:520px;z-index:1}
     .steps{display:flex;align-items:center;margin-bottom:2.5rem;font-family:var(--mono);font-size:.7rem;color:var(--m)}
     .step{display:flex;align-items:center;gap:.5rem}
-    .sn{width:22px;height:22px;border-radius:50%;border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:.65rem}
+    .sn{width:22px;height:22px;border-radius:50%;border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:.65rem;transition:all .4s}
     .step.done .sn{background:var(--g);border-color:var(--g);color:#000}
     .step.act .sn{background:var(--a);border-color:var(--a);color:#fff}
-    .sl{flex:1;height:1px;background:var(--b);margin:0 .75rem}
-    .step.done+.sl{background:var(--g)}
-    .card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:2.5rem;position:relative;overflow:hidden}
+    .sl{flex:1;height:1px;background:var(--b);margin:0 .75rem;transition:background .4s}
+    .sl.done{background:var(--g)}
+    .card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:2.5rem;position:relative;overflow:hidden;display:none}
     .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--a),var(--g))}
-    .si{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.5rem}
-    .si.ld{background:var(--as);animation:pulse 1.5s infinite}
+    .si{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.5rem}
+    .si.spin{background:var(--as);animation:pulse 1.2s infinite}
     .si.ok{background:var(--gs)}
     .si.er{background:rgba(255,77,109,.1)}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.94)}}
     h1{font-size:1.6rem;font-weight:800;margin-bottom:.5rem}
-    .sub{color:var(--m);font-size:.88rem;line-height:1.6;margin-bottom:1.5rem}
-    .code{background:#07070c;border:1px solid var(--b);border-radius:10px;padding:1.25rem 1.5rem;font-family:var(--mono);font-size:.76rem;line-height:1.7;color:#a8d8a8;position:relative;word-break:break-all;white-space:pre-wrap;margin-bottom:1rem}
-    .cp{position:absolute;top:.75rem;right:.75rem;background:var(--b);border:none;border-radius:6px;color:var(--m);font-family:var(--mono);font-size:.68rem;padding:.3rem .6rem;cursor:pointer;transition:all .2s}
-    .cp:hover{background:var(--a);color:#fff}
-    .cp.done{background:var(--g);color:#000}
-    .info{background:var(--as);border:1px solid rgba(10,102,194,.2);border-radius:8px;padding:.75rem 1rem;font-size:.78rem;color:#7ab3e8;margin-bottom:1.25rem;line-height:1.5}
-    .div{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:var(--m);font-size:.75rem;font-family:var(--mono)}
-    .div::before,.div::after{content:'';flex:1;height:1px;background:var(--b)}
-    label{font-size:.72rem;font-family:var(--mono);color:var(--m);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.4rem}
-    textarea{width:100%;background:#07070c;border:1px solid var(--b);border-radius:10px;padding:.9rem 1rem;color:var(--t);font-family:var(--mono);font-size:.8rem;outline:none;resize:vertical;transition:border-color .2s}
-    textarea:focus{border-color:var(--a)}
-    .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:.9rem;border-radius:10px;font-family:var(--sans);font-size:.9rem;font-weight:700;cursor:pointer;border:none;background:var(--a);color:#fff;transition:all .2s;margin-top:1rem;text-decoration:none}
-    .btn:hover{background:#0855a5;transform:translateY(-1px)}
-    .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-    #err,#ok,#ld,#main{display:none}
+    p{color:var(--m);font-size:.88rem;line-height:1.6;margin-bottom:1rem}
+    .prog{background:var(--b);border-radius:4px;height:4px;overflow:hidden;margin-bottom:1.5rem}
+    .prog-bar{height:100%;background:linear-gradient(90deg,var(--a),var(--g));border-radius:4px;transition:width .5s ease;width:0%}
+    .step-label{font-family:var(--mono);font-size:.72rem;color:var(--m);margin-bottom:1rem}
+    .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:.9rem;border-radius:10px;font-family:var(--sans);font-size:.9rem;font-weight:700;cursor:pointer;border:none;background:var(--a);color:#fff;transition:all .2s;margin-top:.5rem;text-decoration:none}
+    .btn:hover{background:#0855a5}
   </style>
 </head>
 <body>
 <div class="wrap">
   <div class="steps">
     <div class="step done"><div class="sn">✓</div><span>Authorize</span></div>
-    <div class="sl"></div>
-    <div class="step act"><div class="sn">2</div><span>Get Token</span></div>
-    <div class="sl"></div>
-    <div class="step"><div class="sn">3</div><span>Register</span></div>
+    <div class="sl" id="sl1"></div>
+    <div class="step act" id="step2"><div class="sn">2</div><span>Connecting</span></div>
+    <div class="sl" id="sl2"></div>
+    <div class="step" id="step3"><div class="sn">3</div><span>Register</span></div>
   </div>
-  <div class="card" id="ld"><div class="si ld">⚡</div><h1>Connecting...</h1><p class="sub">Capturing your LinkedIn authorization.</p></div>
-  <div class="card" id="err"><div class="si er">✕</div><h1>Authorization Failed</h1><p class="sub" id="errmsg">LinkedIn denied the authorization.</p><a href="index.html" class="btn">← Try Again</a></div>
-  <div class="card" id="main">
-    <div class="si ok">✓</div>
-    <h1>Almost there.</h1>
-    <p class="sub">LinkedIn authorized you. Run this in your terminal to exchange the code for an access token.</p>
-    <div class="info">🔐 Replace <code>YOUR_CLIENT_ID</code> and <code>YOUR_CLIENT_SECRET</code> with your LinkedIn App credentials.</div>
-    <div class="code" id="curlblock"><button class="cp" id="cpbtn" onclick="copyCurl()">copy</button><span id="curlcmd"></span></div>
-    <p class="sub" style="font-size:.8rem;margin-bottom:0">Copy the <code style="color:var(--g)">access_token</code> from the JSON response and paste below.</p>
-    <div class="div">then paste token here</div>
-    <label>Access Token</label>
-    <textarea id="tok" rows="3" placeholder="AQX...paste your access_token here..."></textarea>
-    <button class="btn" id="nextbtn" onclick="next()" disabled>Continue to Registration →</button>
+
+  <!-- Loading -->
+  <div class="card" id="card-loading" style="display:block">
+    <div class="si spin">⚡</div>
+    <h1>Connecting your account...</h1>
+    <div class="prog"><div class="prog-bar" id="pbar"></div></div>
+    <div class="step-label" id="step-text">Exchanging authorization code...</div>
+    <p>This takes just a second. Please don't close this tab.</p>
   </div>
-  <div class="card" id="ok"><div class="si ok">✓</div><h1>Token saved.</h1><p class="sub">Redirecting to registration...</p></div>
+
+  <!-- Error -->
+  <div class="card" id="card-error">
+    <div class="si er">✕</div>
+    <h1>Something went wrong</h1>
+    <p id="errmsg">LinkedIn returned an error. Please try again.</p>
+    <a href="index.html" class="btn">← Try Again</a>
+  </div>
+
+  <!-- Success -->
+  <div class="card" id="card-success">
+    <div class="si ok">🎉</div>
+    <h1>Account connected!</h1>
+    <p>LinkedIn verified. Taking you to the final step...</p>
+  </div>
 </div>
+
 <script>
-  const REDIR=window.location.origin+window.location.pathname;
-  function show(id){['ld','err','main','ok'].forEach(s=>document.getElementById(s).style.display=s===id?'block':'none')}
-  function copyCurl(){
-    navigator.clipboard.writeText(document.getElementById('curlcmd').textContent).then(()=>{
-      const b=document.getElementById('cpbtn');b.textContent='copied!';b.classList.add('done');
-      setTimeout(()=>{b.textContent='copy';b.classList.remove('done')},2000);
+  // ── CONFIG ────────────────────────────────────────────────────────────────
+  const RAILWAY_URL = 'REPLACE_WITH_RAILWAY_URL'; // e.g. https://linkedin-agent.up.railway.app
+  // ─────────────────────────────────────────────────────────────────────────
+
+  function show(id) {
+    ['card-loading','card-error','card-success'].forEach(c => {
+      document.getElementById(c).style.display = c === id ? 'block' : 'none';
     });
   }
-  function next(){
-    const t=document.getElementById('tok').value.trim();
-    if(!t)return;
-    sessionStorage.setItem('li_token',t);
-    show('ok');
-    setTimeout(()=>window.location.href='register.html',1200);
+
+  function setProgress(pct, label) {
+    document.getElementById('pbar').style.width = pct + '%';
+    document.getElementById('step-text').textContent = label;
   }
-  document.getElementById('tok').addEventListener('input',function(){document.getElementById('nextbtn').disabled=this.value.trim().length<10});
-  window.onload=function(){
-    show('ld');
-    const p=new URL(window.location.href).searchParams;
-    const code=p.get('code'),error=p.get('error');
-    setTimeout(()=>{
-      if(error){document.getElementById('errmsg').textContent=p.get('error_description')||'Error: '+error;show('err');return}
-      if(!code){document.getElementById('errmsg').textContent='No authorization code found. Please try again.';show('err');return}
-      const cmd=`curl -X POST https://www.linkedin.com/oauth/v2/accessToken \\\n  -H "Content-Type: application/x-www-form-urlencoded" \\\n  -d "grant_type=authorization_code" \\\n  -d "code=${code}" \\\n  -d "redirect_uri=${encodeURIComponent(REDIR)}" \\\n  -d "client_id=YOUR_CLIENT_ID" \\\n  -d "client_secret=YOUR_CLIENT_SECRET"`;
-      document.getElementById('curlcmd').textContent=cmd;
-      sessionStorage.setItem('li_code',code);
-      show('main');
-    },800);
-  };
+
+  function showError(msg) {
+    document.getElementById('errmsg').textContent = msg;
+    show('card-error');
+  }
+
+  async function run() {
+    const params   = new URL(window.location.href).searchParams;
+    const code     = params.get('code');
+    const error    = params.get('error');
+    const errorDesc = params.get('error_description');
+
+    if (error) { showError(errorDesc || 'LinkedIn denied the request: ' + error); return; }
+    if (!code)  { showError('No authorization code found. Please try connecting again.'); return; }
+
+    const redirectUri = window.location.origin + window.location.pathname;
+
+    try {
+      // Step 1: exchange code → token + URN via Railway server
+      setProgress(30, 'Exchanging authorization code...');
+      const res = await fetch(`${RAILWAY_URL}/auth/linkedin/token`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ code, redirect_uri: redirectUri }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Server error ${res.status}`);
+      }
+
+      setProgress(70, 'Fetching your LinkedIn profile...');
+      const { access_token, person_urn, name } = await res.json();
+
+      setProgress(100, 'Done!');
+
+      // Store for register page
+      sessionStorage.setItem('li_token',  access_token);
+      sessionStorage.setItem('li_urn',    person_urn);
+      sessionStorage.setItem('li_name',   name || '');
+
+      // Update steps UI
+      document.getElementById('step2').className = 'step done';
+      document.getElementById('sl1').className   = 'sl done';
+      document.getElementById('step3').className = 'step act';
+      document.getElementById('sl2').className   = 'sl done';
+
+      show('card-success');
+      setTimeout(() => window.location.href = 'register.html', 1500);
+
+    } catch (err) {
+      showError(err.message || 'Failed to connect. Please try again.');
+    }
+  }
+
+  run();
 </script>
 </body>
 </html>

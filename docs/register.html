@@ -108,7 +108,11 @@
 <script>
   window.onload=function(){
     const t=sessionStorage.getItem('li_token');
+    const u=sessionStorage.getItem('li_urn');
+    const n=sessionStorage.getItem('li_name');
     if(t){document.getElementById('f-token').value=t;document.getElementById('pfill').style.display='block'}
+    if(u){document.getElementById('f-urn').value=u}
+    if(n){document.getElementById('f-name').value=n}
     document.querySelectorAll('.topt input').forEach(cb=>{
       cb.addEventListener('change',function(){this.closest('.topt').classList.toggle('sel',this.checked)});
     });
