@@ -24,7 +24,7 @@
       "voiceProfile": "Short, punchy sentences. First-person, conversational. No fluff. Under 150 words.",
       "themes": ["ai-productivity", "personal-growth"],
       "currentThemeIndex": 0,
-      "active": true,
+      "active": false,
       "addedOn": "2026-03-15",
       "postHistory": []
     }
