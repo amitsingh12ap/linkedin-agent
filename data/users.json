@@ -13,6 +13,20 @@
       "active": true,
       "addedOn": "2026-03-15",
       "postHistory": []
+    },
+    {
+      "id": "mukta",
+      "name": "Mukta Singh",
+      "personUrn": "urn:li:person:8xCVt390DR",
+      "accessToken": "AQWKy9bLc2_Xd5IDQmMfDK6o-pX9NfhSNmR8dFwbYdTROj9qx3miL8Vakrg8b84JpVEf3xbrpqkJAiXuM2Ixpr0ZCEi_yzL2py8X7sKIFDmgsvu9SdWTkvBAMPYlvLlS5n26aL2v8Z2ReerSzDc_P9mEAAfYGim3ezo_LL9C_slDfPqxIPUlCdvi2Zaa_5iBlUw20XvlT3nV43opbw7qSoOjhqpnIGnE_eQ6OB-VmYDwY-ZH79dyQ8Uw0_iNSj1xxsLtMLd2v6Y8j3GYDDaiGnuIVokgxb1HhayfJpz5sw85S_3LtOYuawr7BTeb0dxW-kp32EptzP6b5qPRUYiR8NtTH0DnmA",
+      "tokenExpiry": "2026-05-15",
+      "role": "Not specified",
+      "voiceProfile": "Short, punchy sentences. First-person, conversational. No fluff. Under 150 words.",
+      "themes": ["ai-productivity", "personal-growth"],
+      "currentThemeIndex": 0,
+      "active": true,
+      "addedOn": "2026-03-15",
+      "postHistory": []
     }
   ]
 }
