@@ -2,7 +2,7 @@
   "name": "linkedin-agent",
   "version": "2.0.0",
   "description": "Daily LinkedIn post agent — engineering leadership voice, powered by Claude",
-  "main": "src/agent.js",
+  "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "agent": "node src/agent.js",
