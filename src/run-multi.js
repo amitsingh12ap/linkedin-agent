@@ -127,6 +127,7 @@ async function main() {
         });
         // Keep last 30 entries only
         userInData.postHistory = userInData.postHistory.slice(0, 30);
+        userInData.pendingTopic = null; // clear after posting
         results.push({ user: user.id, status: "success", postId: result.id });
       } else {
         logger.info(`   ⏭️  DRY RUN — skipping publish`);

@@ -76,7 +76,27 @@ Do NOT write:
  * @param {boolean} forceNewAngle   - force a different angle (regenerate mode)
  */
 async function generatePostForUser(user, themeId, recentPostTypes = [], forceNewAngle = false) {
-  const angles = THEME_ANGLES[themeId];
+  const today = new Date().toLocaleDateString("en-IN", { weekday: "long", month: "long", day: "numeric" });
+  const newsContext = await getTodaysHeadlines();
+
+  // ── Custom topic mode ─────────────────────────────────────────────────────
+  if (user.pendingTopic) {
+    console.log(`   💡 Using custom topic: "${user.pendingTopic}"`);
+    const message = await client.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 300,
+      system: buildVoicePrompt(user),
+      messages: [{
+        role: "user",
+        content: `Today is ${today}.\n\nWrite a LinkedIn post about: "${user.pendingTopic}"\n\nMake it specific, personal, and insightful. Draw from real experience. Output only the post text.`,
+      }],
+    });
+    const post = message.content[0].text.trim();
+    if (post.length > 1500) throw new Error(`Post too long: ${post.length} chars`);
+    return { post, postType: "custom_topic" };
+  }
+
+  // ── Theme rotation mode ───────────────────────────────────────────────────
   if (!angles) throw new Error(`Unknown theme: ${themeId}`);
 
   const exclude = forceNewAngle ? recentPostTypes.slice(-3) : recentPostTypes.slice(-2);

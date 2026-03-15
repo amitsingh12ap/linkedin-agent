@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>LinkedIn Agent — What's today's post?</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0a0a0f;--s:#111118;--b:#1e1e2e;--a:#0A66C2;--as:rgba(10,102,194,.12);--g:#00c896;--gs:rgba(0,200,150,.1);--t:#e8e8f0;--m:#6b6b80;--mono:'DM Mono',monospace;--sans:'Syne',sans-serif}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--t);font-family:var(--sans);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(10,102,194,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(10,102,194,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+    .wrap{width:100%;max-width:560px;z-index:1}
+    .nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem}
+    .logo{font-family:var(--mono);font-size:.82rem;display:flex;align-items:center;gap:.5rem;color:var(--t);text-decoration:none}
+    .dot{width:7px;height:7px;background:var(--g);border-radius:50%;animation:blink 2s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .time-badge{font-family:var(--mono);font-size:.7rem;background:var(--gs);color:var(--g);border:1px solid rgba(0,200,150,.2);padding:.3rem .75rem;border-radius:20px}
+    .card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:2rem;position:relative;overflow:hidden}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--a),var(--g))}
+    h1{font-size:1.7rem;font-weight:800;margin-bottom:.4rem;line-height:1.2}
+    h1 span{color:var(--a)}
+    .sub{color:var(--m);font-size:.85rem;line-height:1.6;margin-bottom:1.75rem}
+    .field{margin-bottom:1.25rem}
+    .field label{font-family:var(--mono);font-size:.7rem;color:var(--m);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.4rem}
+    .field input,.field textarea,.field select{width:100%;background:#07070c;border:1px solid var(--b);border-radius:8px;padding:.8rem 1rem;color:var(--t);font-family:var(--mono);font-size:.82rem;outline:none;transition:border-color .2s}
+    .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--a)}
+    .field select option{background:#07070c}
+    .field textarea{resize:vertical;min-height:100px}
+    .field input::placeholder,.field textarea::placeholder{color:#3a3a4f}
+    .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem}
+    .chip{background:#07070c;border:1px solid var(--b);border-radius:20px;padding:.35rem .85rem;font-family:var(--mono);font-size:.72rem;cursor:pointer;transition:all .2s;color:var(--m)}
+    .chip:hover{border-color:var(--a);color:var(--t)}
+    .chip.sel{border-color:var(--a);background:var(--as);color:var(--t)}
+    .btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.9rem;border-radius:10px;font-family:var(--sans);font-size:.9rem;font-weight:700;cursor:pointer;border:none;background:var(--a);color:#fff;transition:all .2s;margin-top:.5rem}
+    .btn:hover{background:#0855a5;transform:translateY(-1px)}
+    .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .divider{display:flex;align-items:center;gap:1rem;margin:1.25rem 0;color:var(--m);font-size:.72rem;font-family:var(--mono)}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--b)}
+    /* first-time setup */
+    #setup-panel{display:none}
+    .setup-hint{font-family:var(--mono);font-size:.72rem;color:var(--m);margin-top:.4rem}
+    .setup-hint a{color:var(--a);text-decoration:none}
+    /* success */
+    #success-panel{display:none;text-align:center;padding:1rem 0}
+    .sico{width:56px;height:56px;background:var(--gs);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 1.25rem;animation:pop .4s ease}
+    @keyframes pop{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+    #success-panel h2{font-size:1.4rem;font-weight:800;margin-bottom:.5rem}
+    #success-panel p{color:var(--m);font-size:.85rem;line-height:1.6}
+    .post-preview{background:#07070c;border:1px solid var(--b);border-radius:10px;padding:1rem 1.25rem;font-family:var(--mono);font-size:.75rem;color:var(--t);line-height:1.6;margin-top:1rem;text-align:left;white-space:pre-wrap}
+    .again-btn{display:inline-block;margin-top:1.25rem;font-family:var(--mono);font-size:.75rem;color:var(--a);cursor:pointer;text-decoration:underline}
+    /* who am i */
+    .who{background:var(--gs);border:1px solid rgba(0,200,150,.2);border-radius:8px;padding:.6rem 1rem;font-family:var(--mono);font-size:.75rem;color:var(--g);margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between}
+    .who-change{color:var(--m);cursor:pointer;font-size:.68rem;text-decoration:underline}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav">
+    <a href="index.html" class="logo"><div class="dot"></div>linkedin-agent</a>
+    <div class="time-badge" id="ist-time">Loading...</div>
+  </div>
+
+  <div class="card">
+    <!-- Main topic form -->
+    <div id="main-panel">
+      <h1>What should we post <span>today?</span></h1>
+      <p class="sub">Submit before 9 AM IST and we'll write it in your voice. Skip it and we'll pick a theme automatically.</p>
+
+      <!-- Who am I -->
+      <div class="who" id="who-badge" style="display:none">
+        <span id="who-name">👤 Loading...</span>
+        <span class="who-change" onclick="showSetup()">change</span>
+      </div>
+
+      <div class="field">
+        <label>Your topic for today</label>
+        <textarea id="topic-input" placeholder="e.g. My experience debugging SSAI at 100M concurrent users&#10;&#10;or: Why I stopped doing daily standups&#10;&#10;or: What I learned hiring my 10th engineer"></textarea>
+        <div class="chips" id="suggestion-chips"></div>
+      </div>
+
+      <button class="btn" id="submit-btn" onclick="submitTopic()">
+        Set Today's Topic →
+      </button>
+
+      <div class="divider">or</div>
+
+      <button class="btn" style="background:transparent;border:1px solid var(--b);color:var(--m)" onclick="skipTopic()">
+        Let the agent pick a theme automatically
+      </button>
+    </div>
+
+    <!-- First time setup -->
+    <div id="setup-panel">
+      <h1>First time here?</h1>
+      <p class="sub">Enter your LinkedIn Person URN so we know who you are. You only do this once — we'll remember you.</p>
+      <div class="field">
+        <label>Your Person URN</label>
+        <input type="text" id="urn-input" placeholder="urn:li:person:ABC123xyz"/>
+        <div class="setup-hint">Find it at <a href="index.html">linkedin-agent home</a> after connecting your account.</div>
+      </div>
+      <button class="btn" onclick="saveUrn()">Save & Continue →</button>
+    </div>
+
+    <!-- Success -->
+    <div id="success-panel">
+      <div class="sico">✅</div>
+      <h2 id="success-title">Topic set!</h2>
+      <p id="success-msg">We'll write your post at 9 AM IST.</p>
+      <span class="again-btn" onclick="showMain()">← Set a different topic</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const RAILWAY_URL = 'https://linkedin-agent-production-f234.up.railway.app';
+
+  const SUGGESTIONS = {
+    'engineering-leadership': ['Why 1:1s fail', 'Hiring mistakes I made', 'How I give hard feedback', 'Managing remote engineers', 'When to promote vs hire'],
+    'ai-productivity':        ['Using Claude for code reviews', 'AI in my debugging workflow', 'Where AI saves me hours', 'LLMs in production — real talk', 'Prompt engineering myths'],
+    'streaming-tech':         ['SSAI at scale learnings', 'Why buffering still happens', 'HLS vs DASH in 2026', '4K streaming realities', 'CDN war stories'],
+    'personal-growth':        ['Career mistake I made', 'How I say no at work', 'What burnout taught me', 'Why I changed my mind about X', 'Lessons from a bad project'],
+  };
+
+  // IST clock
+  function updateClock() {
+    const now = new Date();
+    const ist = new Date(now.getTime() + now.getTimezoneOffset()*60000 + 5.5*3600000);
+    const h = ist.getHours(), m = String(ist.getMinutes()).padStart(2,'0');
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    const hoursLeft = 9 - h - (m > 0 ? 1 : 0);
+    const badge = document.getElementById('ist-time');
+    if (h < 9) {
+      badge.textContent = `${h12}:${m} ${ampm} IST · ${hoursLeft}h to post`;
+      badge.style.background = 'var(--gs)';
+      badge.style.color = 'var(--g)';
+    } else {
+      badge.textContent = `${h12}:${m} ${ampm} IST · posted today ✓`;
+      badge.style.background = 'var(--as)';
+      badge.style.color = '#7ab3e8';
+    }
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Suggestion chips
+  function loadSuggestions(urn) {
+    const chips = document.getElementById('suggestion-chips');
+    chips.innerHTML = '';
+    // Get all suggestions flat
+    const all = Object.values(SUGGESTIONS).flat();
+    // Pick 6 random ones
+    const picked = all.sort(() => Math.random() - 0.5).slice(0, 6);
+    picked.forEach(s => {
+      const c = document.createElement('div');
+      c.className = 'chip';
+      c.textContent = s;
+      c.onclick = () => {
+        document.querySelectorAll('.chip').forEach(x => x.classList.remove('sel'));
+        c.classList.add('sel');
+        document.getElementById('topic-input').value = s;
+      };
+      chips.appendChild(c);
+    });
+  }
+
+  // Show/hide panels
+  function showMain()  { document.getElementById('main-panel').style.display='block'; document.getElementById('setup-panel').style.display='none'; document.getElementById('success-panel').style.display='none'; }
+  function showSetup() { document.getElementById('main-panel').style.display='none'; document.getElementById('setup-panel').style.display='block'; document.getElementById('success-panel').style.display='none'; }
+  function showSuccess(title, msg) {
+    document.getElementById('main-panel').style.display='none';
+    document.getElementById('setup-panel').style.display='none';
+    document.getElementById('success-panel').style.display='block';
+    document.getElementById('success-title').textContent = title;
+    document.getElementById('success-msg').textContent = msg;
+  }
+
+  function saveUrn() {
+    const urn = document.getElementById('urn-input').value.trim();
+    if (!urn.startsWith('urn:li:person:')) { alert('Please enter a valid URN starting with urn:li:person:'); return; }
+    localStorage.setItem('li_urn', urn);
+    init();
+  }
+
+  async function submitTopic() {
+    const urn   = localStorage.getItem('li_urn');
+    const topic = document.getElementById('topic-input').value.trim();
+    if (!topic) { alert('Please enter a topic first.'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.textContent = 'Saving...'; btn.disabled = true;
+
+    try {
+      const res = await fetch(`${RAILWAY_URL}/user/topic`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urn, topic })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      showSuccess('Topic set! 🎯', `We'll write about "${topic}" at 9 AM IST in your voice.`);
+    } catch(err) {
+      alert('Error: ' + err.message);
+    } finally {
+      btn.textContent = 'Set Today\'s Topic →'; btn.disabled = false;
+    }
+  }
+
+  async function skipTopic() {
+    const urn = localStorage.getItem('li_urn');
+    try {
+      await fetch(`${RAILWAY_URL}/user/topic`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urn, topic: null }) // null = clear pending topic
+      });
+    } catch(e) {}
+    showSuccess('Got it!', 'We\'ll pick the best theme automatically for today\'s post.');
+  }
+
+  function init() {
+    const urn = localStorage.getItem('li_urn');
+    if (!urn) { showSetup(); return; }
+    // Show who badge
+    const badge = document.getElementById('who-badge');
+    badge.style.display = 'flex';
+    document.getElementById('who-name').textContent = `👤 ${urn}`;
+    loadSuggestions(urn);
+    showMain();
+  }
+
+  init();
+</script>
+</body>
+</html>

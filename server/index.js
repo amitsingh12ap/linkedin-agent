@@ -13,6 +13,8 @@ const axios      = require("axios");
 const { handleWhatsAppMessage }   = require("./whatsapp-handler");
 const { checkAndNotifyComments }  = require("./comment-watcher");
 
+const fs   = require("fs");
+const path = require("path");
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
@@ -135,6 +137,24 @@ ${voice || "Not provided — will use default voice."}
     const detail = err.response?.data || err.message;
     console.error("[auth/register] Error:", detail);
     return res.status(500).json({ error: "Failed to create registration", detail });
+  }
+});
+
+// ── User Topic ────────────────────────────────────────────────────────────────
+app.post("/user/topic", (req, res) => {
+  const { urn, topic } = req.body;
+  if (!urn) return res.status(400).json({ error: "Missing urn" });
+  const USERS_PATH = path.join(__dirname, "../data/users.json");
+  try {
+    const data = JSON.parse(fs.readFileSync(USERS_PATH, "utf8"));
+    const user = data.users.find(u => u.personUrn === urn);
+    if (!user) return res.status(404).json({ error: "User not found. Are you registered?" });
+    user.pendingTopic = topic || null;
+    fs.writeFileSync(USERS_PATH, JSON.stringify(data, null, 2));
+    console.log(`[user/topic] ${user.name}: ${topic || "(cleared)"}`);
+    return res.json({ ok: true, user: user.name, topic: user.pendingTopic });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 });
 
